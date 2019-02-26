@@ -8,7 +8,9 @@ let _activity = null;
 let userId = null;
 
 function api(path, opts) {
-
+  if (typeof path !== 'string') {
+    return Promise.reject(new TypeError(`Expected \`path\` to be a string, got ${typeof path}`));
+  }
   opts = Object.assign({
     json: true,
     token: _activity.Context.connector.token,
@@ -40,7 +42,7 @@ function api(path, opts) {
   });
 }
 // convert response from /issues endpoint to 
-api.convertIssues = function (response) {
+api.convertResponse = function (response) {
   let items = [];
   let tickets = response.body.tickets;
 
