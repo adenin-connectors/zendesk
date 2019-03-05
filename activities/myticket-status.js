@@ -39,6 +39,6 @@ module.exports = async (activity) => {
     activity.Response.Data = ticketStatus;
 
   } catch (error) {
-    cfActivity.handleError(error, activity);
+    cfActivity.handleError(activity, error);
   }
 };

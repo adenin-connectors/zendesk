@@ -37,28 +37,10 @@ function api(path, opts) {
   }
 
   return got(url, opts).catch(err => {
-
     throw err;
   });
 }
-// convert response from /issues endpoint to 
-api.convertResponse = function (response) {
-  let items = [];
-  let tickets = response.body.tickets;
 
-  // iterate through each issue and extract id, title, etc. into a new array
-  for (let i = 0; i < tickets.length; i++) {
-    let raw = tickets[i];
-    let item = { id: raw.id, title: raw.subject, description: raw.description, link: `https://devhomehelp.zendesk.com/agent/tickets/${raw.id}`, raw: raw };
-    items.push(item);
-  }
-
-  return { items: items };
-}
-
-function getUserId(userData) {
-  return userData.body.user.id;
-}
 const helpers = [
   'get',
   'post',
@@ -75,7 +57,7 @@ api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
 
 api.initialize = function (activity) {
   _activity = activity;
-}
+};
 
 for (const x of helpers) {
   const method = x.toUpperCase();
@@ -88,6 +70,10 @@ api.getTickets = async function () {
   userId = getUserId(userProfile);
 
   return api(`/users/${userId}/tickets/assigned.json`);
+};
+
+function getUserId(userData) {
+  return userData.body.user.id;
 }
 
 module.exports = api;
