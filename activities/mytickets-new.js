@@ -13,8 +13,8 @@ module.exports = async (activity) => {
 
     let ticketStatus = {
       title: T('New Tickets'),
-      url: 'https://devhomehelp.zendesk.com/agent/filters/360003786638',
-      urlLabel: T('All Tickets')
+      link: 'https://devhomehelp.zendesk.com/agent/filters/360003786638',
+      linkLabel: T('All Tickets')
     };
 
     let ticketNo = response.body.count;
