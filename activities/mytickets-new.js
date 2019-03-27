@@ -1,26 +1,20 @@
 'use strict';
-
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
-
-    var dateRange = cfActivity.dateRange(activity, "today");
+    var dateRange = Activity.dateRange("today");
     let start = new Date(dateRange.startDate).toISOString();
     let end = new Date(dateRange.endDate).toISOString();
 
     const response = await api(`/search.json?query=type:ticket+status:open+created>${start}+created<${end}`);
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let ticketStatus = {
-      title: 'New Open Tickets',
+      title: T('New Tickets'),
       url: 'https://devhomehelp.zendesk.com/agent/filters/360003786638',
-      urlLabel: 'All tickets',
+      urlLabel: T('All Tickets')
     };
 
     let ticketNo = response.body.count;
@@ -28,7 +22,7 @@ module.exports = async (activity) => {
     if (ticketNo != 0) {
       ticketStatus = {
         ...ticketStatus,
-        description: `You have ${ticketNo > 1 ? ticketNo + " new tickets" : ticketNo + " new ticket"} assigned`,
+        description: ticketNo > 1 ? T("You have {0} new tickets.", ticketNo) : T("You have 1 new ticket."),
         color: 'blue',
         value: ticketNo,
         actionable: true
@@ -36,13 +30,13 @@ module.exports = async (activity) => {
     } else {
       ticketStatus = {
         ...ticketStatus,
-        description: `You have no new tickets assigned`,
+        description: T(`You have no new tickets.`),
         actionable: false
       };
     }
 
     activity.Response.Data = ticketStatus;
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    Activity.handleError(error);
   }
 };

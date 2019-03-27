@@ -1,10 +1,8 @@
 'use strict';
 const got = require('got');
-const isPlainObj = require('is-plain-obj');
 const HttpAgent = require('agentkeepalive');
 const HttpsAgent = HttpAgent.HttpsAgent;
 
-let _activity = null;
 let userId = null;
 
 function api(path, opts) {
@@ -13,7 +11,7 @@ function api(path, opts) {
   }
   opts = Object.assign({
     json: true,
-    token: _activity.Context.connector.token,
+    token: Activity.Context.connector.token,
     endpoint: 'https://devhomehelp.zendesk.com/api/v2',
     agent: {
       http: new HttpAgent(),
@@ -55,21 +53,20 @@ api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
   stream: true
 }));
 
-api.initialize = function (activity) {
-  _activity = activity;
-};
-
 for (const x of helpers) {
   const method = x.toUpperCase();
   api[x] = (url, opts) => api(url, Object.assign({}, opts, { method }));
   api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
 }
 
-api.getTickets = async function () {
+api.getTickets = async function (pagination) {
   let userProfile = await api('/users/me.json');
   userId = getUserId(userProfile);
-
-  return api(`/users/${userId}/tickets/assigned.json`);
+  let url = `/users/${userId}/tickets/assigned.json`;
+  if(pagination){
+    url+=`&page=${pagination.page}`;
+  }
+  return api(url);
 };
 
 function getUserId(userData) {

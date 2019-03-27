@@ -1,2 +1,8 @@
+ServiceName: 'myopentickets'
 InterfaceName: items
 Description: List Of Tickets
+APIDoc: ''
+Interfaces: 'search,pagination'
+RequiredScopes: ''
+AdditionalParameters:
+Method: ''

@@ -1,21 +1,16 @@
 'use strict';
-
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
     const response = await api.getTickets();
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let ticketStatus = {
-      title: 'Open Tickets',
+      title: T('Open Tickets'),
       url: 'https://devhomehelp.zendesk.com/agent/filters/360003786638',
-      urlLabel: 'All tickets',
+      urlLabel: T('All Tickets')
     };
 
     let ticketNo = response.body.tickets.length;
@@ -23,7 +18,7 @@ module.exports = async (activity) => {
     if (ticketNo != 0) {
       ticketStatus = {
         ...ticketStatus,
-        description: `You have ${ticketNo > 1 ? ticketNo + " tickets" : ticketNo + " ticket"} assigned`,
+        description: ticketNo > 1 ? T("You have {0} tickets.", ticketNo) : T("You have 1 ticket."),
         color: 'blue',
         value: ticketNo,
         actionable: true
@@ -31,7 +26,7 @@ module.exports = async (activity) => {
     } else {
       ticketStatus = {
         ...ticketStatus,
-        description: `You have no tickets assigned`,
+        description: T(`You have no tickets.`),
         actionable: false
       }
     }
@@ -39,6 +34,6 @@ module.exports = async (activity) => {
     activity.Response.Data = ticketStatus;
 
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    Activity.handleError(error);
   }
 };
