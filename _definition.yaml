@@ -24,6 +24,9 @@ Custom2Hint: ''
 Custom3Label: Custom Field 3
 Custom3Hint: ''
 Scopes:
-- ScopeName: read
+- ScopeName: tickets:read
   ScopeDescription: Grants read right to zendesk tickets.
+  IsDefault: false
+- ScopeName: tickets:write
+  ScopeDescription: Grants write right to zendesk tickets.
   IsDefault: false

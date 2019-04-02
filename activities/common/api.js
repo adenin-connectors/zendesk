@@ -9,10 +9,11 @@ function api(path, opts) {
   if (typeof path !== 'string') {
     return Promise.reject(new TypeError(`Expected \`path\` to be a string, got ${typeof path}`));
   }
+  let zendeskDomain = api.getDomain();
   opts = Object.assign({
     json: true,
     token: Activity.Context.connector.token,
-    endpoint: 'https://devhomehelp.zendesk.com/api/v2',
+    endpoint: `https://${zendeskDomain}/api/v2`,
     agent: {
       http: new HttpAgent(),
       https: new HttpsAgent()
@@ -21,7 +22,7 @@ function api(path, opts) {
 
   opts.headers = Object.assign({
     accept: 'application/json',
-    'user-agent': 'adenin Now Assistant Connector, https://www.adenin.com/now-assistant'
+    'user-agent': 'adenin Digital Assistant Connector, https://www.adenin.com/digital-assistant'
   }, opts.headers);
 
   if (opts.token) {
@@ -59,13 +60,26 @@ for (const x of helpers) {
   api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
 }
 
+//** returns Zendesk domain in correct format */
+api.getDomain = function () {
+  let domain = Activity.Context.connector.custom1;
+  domain = domain.replace('https://', '');
+  domain = domain.replace('/', '');
+
+  if (!domain.includes('.zendesk.com')) {
+    domain += '.zendesk.com';
+  }
+  return domain;
+};
+
 api.getTickets = async function (pagination) {
   let userProfile = await api('/users/me.json');
   userId = getUserId(userProfile);
   let url = `/users/${userId}/tickets/assigned.json`;
-  if(pagination){
-    url+=`&page=${pagination.page}`;
+  if (pagination) {
+    url += `&page=${pagination.page}`;
   }
+  
   return api(url);
 };
 

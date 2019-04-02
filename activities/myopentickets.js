@@ -18,7 +18,7 @@ module.exports = async function (activity) {
 function convertResponse(response) {
   let items = [];
   let tickets = response.body.tickets;
-
+  let zendeskDomain = api.getDomain();
   // iterate through each issue and extract id, title, etc. into a new array
   for (let i = 0; i < tickets.length; i++) {
     let raw = tickets[i];
@@ -26,7 +26,7 @@ function convertResponse(response) {
       id: raw.id,
       title: raw.subject,
       description: raw.description,
-      link: `https://devhomehelp.zendesk.com/agent/tickets/${raw.id}`,
+      link: `https://${zendeskDomain}/agent/tickets/${raw.id}`,
       raw: raw
     };
     items.push(item);

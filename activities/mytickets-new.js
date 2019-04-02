@@ -10,10 +10,10 @@ module.exports = async (activity) => {
     const response = await api(`/search.json?query=type:ticket+status:open+created>${start}+created<${end}`);
 
     if (Activity.isErrorResponse(response)) return;
-
+    let zendeskDomain = api.getDomain();
     let ticketStatus = {
       title: T('New Tickets'),
-      link: 'https://devhomehelp.zendesk.com/agent/filters/360003786638',
+      link: `https://${zendeskDomain}/agent/filters/360003786638`,
       linkLabel: T('All Tickets')
     };
 
