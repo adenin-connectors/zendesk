@@ -9,7 +9,9 @@ function api(path, opts) {
   if (typeof path !== 'string') {
     return Promise.reject(new TypeError(`Expected \`path\` to be a string, got ${typeof path}`));
   }
-  let zendeskDomain = api.getDomain();
+
+  const zendeskDomain = api.getDomain();
+
   opts = Object.assign({
     json: true,
     token: Activity.Context.connector.token,
@@ -35,7 +37,7 @@ function api(path, opts) {
     return got.stream(url, opts);
   }
 
-  return got(url, opts).catch(err => {
+  return got(url, opts).catch((err) => {
     throw err;
   });
 }
@@ -49,37 +51,42 @@ const helpers = [
   'delete'
 ];
 
-api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
+api.stream = (url, opts) => got(url, Object.assign({}, opts, {
   json: false,
   stream: true
 }));
 
 for (const x of helpers) {
   const method = x.toUpperCase();
-  api[x] = (url, opts) => api(url, Object.assign({}, opts, { method }));
-  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
+  api[x] = (url, opts) => api(url, Object.assign({}, opts, {method}));
+  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, {method}));
 }
 
 //** returns Zendesk domain in correct format */
 api.getDomain = function () {
   let domain = Activity.Context.connector.custom1;
+
   domain = domain.replace('https://', '');
   domain = domain.replace('/', '');
 
   if (!domain.includes('.zendesk.com')) {
     domain += '.zendesk.com';
   }
+
   return domain;
 };
 
 api.getTickets = async function (pagination) {
-  let userProfile = await api('/users/me.json');
+  const userProfile = await api('/users/me.json');
+
   userId = getUserId(userProfile);
+
   let url = `/users/${userId}/tickets/assigned.json`;
+
   if (pagination) {
     url += `&page=${pagination.page}`;
   }
-  
+
   return api(url);
 };
 
