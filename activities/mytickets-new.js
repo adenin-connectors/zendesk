@@ -3,18 +3,19 @@ const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    var dateRange = Activity.dateRange("today");
+    var dateRange = $.dateRange(activity, "today");
     let start = new Date(dateRange.startDate).toISOString();
     let end = new Date(dateRange.endDate).toISOString();
 
+    api.initialize(activity);
     const response = await api(`/search.json?query=type:ticket+status:open+created>${start}+created<${end}`);
+    if ($.isErrorResponse(activity, response)) return;
 
-    if (Activity.isErrorResponse(response)) return;
     let zendeskDomain = api.getDomain();
     let ticketStatus = {
-      title: T('New Tickets'),
+      title: T(activity, 'New Tickets'),
       link: `https://${zendeskDomain}/agent/filters/360003786638`,
-      linkLabel: T('All Tickets')
+      linkLabel: T(activity, 'All Tickets')
     };
 
     let ticketNo = response.body.count;
@@ -22,7 +23,7 @@ module.exports = async (activity) => {
     if (ticketNo != 0) {
       ticketStatus = {
         ...ticketStatus,
-        description: ticketNo > 1 ? T("You have {0} new tickets.", ticketNo) : T("You have 1 new ticket."),
+        description: ticketNo > 1 ? T(activity, "You have {0} new tickets.", ticketNo) : T(activity, "You have 1 new ticket."),
         color: 'blue',
         value: ticketNo,
         actionable: true
@@ -30,13 +31,13 @@ module.exports = async (activity) => {
     } else {
       ticketStatus = {
         ...ticketStatus,
-        description: T(`You have no new tickets.`),
+        description: T(activity, `You have no new tickets.`),
         actionable: false
       };
     }
 
     activity.Response.Data = ticketStatus;
   } catch (error) {
-    Activity.handleError(error);
+    $.handleError(activity, error);
   }
 };

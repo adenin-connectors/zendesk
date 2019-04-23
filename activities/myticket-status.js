@@ -3,14 +3,15 @@ const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
+    api.initialize(activity);
     const response = await api.getTickets();
 
-    if (Activity.isErrorResponse(response)) return;
+    if ($.isErrorResponse(activity, response)) return;
     let zendeskDomain = api.getDomain();
     let ticketStatus = {
-      title: T('Open Tickets'),
+      title: T(activity, 'Open Tickets'),
       link: `https://${zendeskDomain}/agent/filters/360003786638`,
-      linkLabel: T('All Tickets')
+      linkLabel: T(activity, 'All Tickets')
     };
 
     let ticketNo = response.body.tickets.length;
@@ -18,7 +19,7 @@ module.exports = async (activity) => {
     if (ticketNo != 0) {
       ticketStatus = {
         ...ticketStatus,
-        description: ticketNo > 1 ? T("You have {0} tickets.", ticketNo) : T("You have 1 ticket."),
+        description: ticketNo > 1 ? T(activity, "You have {0} tickets.", ticketNo) : T(activity, "You have 1 ticket."),
         color: 'blue',
         value: ticketNo,
         actionable: true
@@ -26,7 +27,7 @@ module.exports = async (activity) => {
     } else {
       ticketStatus = {
         ...ticketStatus,
-        description: T(`You have no tickets.`),
+        description: T(activity, `You have no tickets.`),
         actionable: false
       }
     }
@@ -34,6 +35,6 @@ module.exports = async (activity) => {
     activity.Response.Data = ticketStatus;
 
   } catch (error) {
-    Activity.handleError(error);
+    $.handleError(activity, error);
   }
 };
