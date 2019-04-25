@@ -4,6 +4,7 @@ const HttpAgent = require('agentkeepalive');
 const HttpsAgent = HttpAgent.HttpsAgent;
 
 let userId = null;
+let _activity = null;
 
 function api(path, opts) {
   if (typeof path !== 'string') {
@@ -14,7 +15,7 @@ function api(path, opts) {
 
   opts = Object.assign({
     json: true,
-    token: Activity.Context.connector.token,
+    token: _activity.Context.connector.token,
     endpoint: `https://${zendeskDomain}/api/v2`,
     agent: {
       http: new HttpAgent(),
@@ -27,15 +28,11 @@ function api(path, opts) {
     'user-agent': 'adenin Digital Assistant Connector, https://www.adenin.com/digital-assistant'
   }, opts.headers);
 
-  if (opts.token) {
-    opts.headers.Authorization = `Bearer ${opts.token}`;
-  }
+  if (opts.token) opts.headers.Authorization = `Bearer ${opts.token}`;
 
   const url = /^http(s)\:\/\/?/.test(path) && opts.endpoint ? path : opts.endpoint + path;
 
-  if (opts.stream) {
-    return got.stream(url, opts);
-  }
+  if (opts.stream) return got.stream(url, opts);
 
   return got(url, opts).catch((err) => {
     throw err;
@@ -51,6 +48,10 @@ const helpers = [
   'delete'
 ];
 
+api.initialize = (activity) => {
+  _activity = activity;
+};
+
 api.stream = (url, opts) => got(url, Object.assign({}, opts, {
   json: false,
   stream: true
@@ -64,7 +65,7 @@ for (const x of helpers) {
 
 //** returns Zendesk domain in correct format */
 api.getDomain = function () {
-  let domain = Activity.Context.connector.custom1;
+  let domain = _activity.Context.connector.custom1;
 
   domain = domain.replace('https://', '');
   domain = domain.replace('/', '');
