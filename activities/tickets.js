@@ -20,7 +20,7 @@ module.exports = async function (activity) {
 
     let zendeskDomain = api.getDomain();
     activity.Response.Data.items = api.convertResponse(response.body.results);
-    activity.Response.Data.title = T(activity, "Open Tickets");
+    activity.Response.Data.title = T(activity, "All Tickets");
     activity.Response.Data.link = `https://${zendeskDomain}/agent/filters/360003786638`;
     activity.Response.Data.linkLabel = T(activity, 'All Tickets');
     activity.Response.Data.actionable = value > 0;
