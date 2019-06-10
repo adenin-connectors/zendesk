@@ -59,8 +59,8 @@ api.stream = (url, opts) => got(url, Object.assign({}, opts, {
 
 for (const x of helpers) {
   const method = x.toUpperCase();
-  api[x] = (url, opts) => api(url, Object.assign({}, opts, {method}));
-  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, {method}));
+  api[x] = (url, opts) => api(url, Object.assign({}, opts, { method }));
+  api.stream[x] = (url, opts) => api.stream(url, Object.assign({}, opts, { method }));
 }
 
 //** returns Zendesk domain in correct format */
@@ -77,22 +77,25 @@ api.getDomain = function () {
   return domain;
 };
 
-api.getTickets = async function (pagination) {
-  const userProfile = await api('/users/me.json');
-
-  userId = getUserId(userProfile);
-
-  let url = `/users/${userId}/tickets/assigned.json`;
-
-  if (pagination) {
-    url += `&page=${pagination.page}`;
+/**maps response data to items */
+api.convertResponse = function (tickets) {
+  let items = [];
+  let zendeskDomain = api.getDomain();
+  // iterate through each issue and extract id, title, etc. into a new array
+  for (let i = 0; i < tickets.length; i++) {
+    let raw = tickets[i];
+    let item = {
+      id: raw.id,
+      title: raw.subject,
+      description: raw.description,
+      date: new Date(raw.created_at).toISOString(),
+      link: `https://${zendeskDomain}/agent/tickets/${raw.id}`,
+      raw: raw
+    };
+    items.push(item);
   }
 
-  return api(url);
+  return { items };
 };
-
-function getUserId(userData) {
-  return userData.body.user.id;
-}
 
 module.exports = api;

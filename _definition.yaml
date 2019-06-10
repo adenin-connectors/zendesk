@@ -1,6 +1,6 @@
 ConnectorTitle: Zendesk
-AccessCodeServiceEndpoint: https://devhomehelp.zendesk.com/oauth/authorizations/new
-AccessTokenServiceEndpoint: https://devhomehelp.zendesk.com/oauth/tokens
+AccessCodeServiceEndpoint: https://topmailer.zendesk.com/oauth/authorizations/new
+AccessTokenServiceEndpoint: https://topmailer.zendesk.com/oauth/tokens
 UserName: hide
 UserPassword: hide
 ClientId: required
@@ -29,4 +29,7 @@ Scopes:
   IsDefault: false
 - ScopeName: tickets:write
   ScopeDescription: Grants write right to zendesk tickets.
+  IsDefault: false
+- ScopeName: read
+  ScopeDescription: Grants read right to zendesk users.
   IsDefault: false
